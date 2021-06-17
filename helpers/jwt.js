@@ -11,13 +11,31 @@ const generarJWT = (uid) => {
                 reject('No se pudo generar el JWT');
             } else {
                 // retorna el token
+                console.log(token);
                 resolve(token);
             }
         });
 
     });
+}
+const comprobarJWT = (token) => {
+
+    try {
+
+        const { uid, iat } = jwt.verify(token, process.env.JWT_KEY);
+        console.log(iat);
+        console.log(uid);
+        return [true, uid];
+
+    } catch (error) {
+        return [false, null];
+    }
 
 }
+
+
+
 module.exports = {
-    generarJWT
+    generarJWT,
+    comprobarJWT
 }

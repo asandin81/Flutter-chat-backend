@@ -42,14 +42,14 @@ const crearUsuario = async(req, res = response) => {
 const login = async(req, res = response) => {
     const { email, password } = req.body;
     try {
-        const usuarioDB = await Usuario.findOne({ email });
-        if (!usuarioDB) {
+        const usuario = await Usuario.findOne({ email });
+        if (!usuario) {
             return res.status(404).json({
                 ok: false,
                 msg: 'email no encontrado'
             })
         }
-        const validarPassword = bcrypt.compareSync(password, usuarioDB.password);
+        const validarPassword = bcrypt.compareSync(password, usuario.password);
         if (!validarPassword) {
             return res.status(400).json({
                 ok: false,
@@ -57,10 +57,10 @@ const login = async(req, res = response) => {
             });
         }
 
-        const token = await generarJWT(usuarioDB.id);
+        const token = await generarJWT(usuario.id);
         return res.json({
             ok: true,
-            usuarioDB,
+            usuario,
             token
         });
     } catch (error) {
@@ -74,18 +74,20 @@ const login = async(req, res = response) => {
 
 const renewToken = async(req, res = response) => {
 
-    // const uid
-    const uid = req.id;
-    //generar JWT
-    const token = await generarJWT(uid);
-    // Obtener el usuario por uid
-    const usuario = await Usuario.findOne({ uid });
+    const uid = req.uid;
 
-    return res.json({
+    // generar un nuevo JWT, generarJWT... uid...
+    const token = await generarJWT(uid);
+
+    // Obtener el usuario por el UID, Usuario.findById... 
+    const usuario = await Usuario.findById(uid);
+
+    res.json({
         ok: true,
         usuario,
         token
     });
+
 }
 
 module.exports = {
